@@ -2,7 +2,7 @@
 {% block content %}
 <h4>Upload Excel Files</h4>
 
-<form method="post" enctype="multipart/form-data" action={{ url_for('upload') }} >
+<form method="post" enctype="multipart/form-data" action={{ url_for('main.upload') }} >
     <label>Configuration Excel (NBA_Config.xlsx)</label>
     <input type="file" name="config" required>
 
