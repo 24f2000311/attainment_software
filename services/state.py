@@ -1,38 +1,53 @@
 import os
 import sys
+from pathlib import Path
 
-def get_runtime_dir():
+# ----------------------------
+# READ-ONLY RESOURCE PATH
+# (templates, static, fonts)
+# ----------------------------
+def resource_path(relative_path: str) -> str:
+    """
+    Get absolute path to resource.
+    Works for normal run and PyInstaller EXE.
+    """
     if getattr(sys, 'frozen', False):
-        # Running as .exe
-        return os.path.dirname(sys.executable)
-    else:
-        # Running normally
-        return os.path.dirname(os.path.abspath(__file__))
-    
-BASE_DIR = get_runtime_dir()
-
-# Go up one level from services/state.py if we want BASE_DIR to be the root,
-# but the original code had BASE_DIR as the directory of app.py.
-# If state.py is in 'services', os.path.dirname(__file__) is '.../services'.
-# app.py was in root.
-# So if we want to maintain the same BASE_DIR relative to the script entry point (app.py),
-# we should actually rely on the main entry point to set this or calculate it carefully.
-# However, `get_runtime_dir` in app.py used `__file__`.
-# If I move get_runtime_dir to services/state.py, `__file__` is `.../services/state.py`.
-# So I need to go up one level.
-if not getattr(sys, 'frozen', False):
-     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
-REPORTS_FOLDER = os.path.join(BASE_DIR, "reports")
+# ----------------------------
+# WRITEABLE USER DATA PATH
+# (uploads, reports)
+# ----------------------------
+def get_user_data_dir() -> Path:
+    """
+    Safe writable directory for EXE and web.
+    """
+    base = Path.home() / "Documents" / "AttainmentSoftware"
+    base.mkdir(parents=True, exist_ok=True)
+    return base
 
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(REPORTS_FOLDER, exist_ok=True)
 
+# ----------------------------
+# DIRECTORIES
+# ----------------------------
+USER_DATA_DIR = get_user_data_dir()
+
+UPLOAD_FOLDER = USER_DATA_DIR / "uploads"
+REPORTS_FOLDER = USER_DATA_DIR / "reports"
+
+UPLOAD_FOLDER.mkdir(exist_ok=True)
+REPORTS_FOLDER.mkdir(exist_ok=True)
+
+
+# ----------------------------
+# APPLICATION STATE
+# ----------------------------
 class AppState:
     cleaned_normalized_data = None
     config_sheets = None
     cqi_actions = []
+
 
 state = AppState()

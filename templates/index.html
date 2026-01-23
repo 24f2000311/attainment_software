@@ -1,14 +1,113 @@
 {% extends "base.html" %}
 {% block content %}
-<h4>Upload Excel Files</h4>
 
-<form method="post" enctype="multipart/form-data" action={{ url_for('main.upload') }} >
-    <label>Configuration Excel (NBA_Config.xlsx)</label>
-    <input type="file" name="config" required>
+<div class="max-w-3xl mx-auto">
+    <!-- Header Section -->
+    <div class="text-center mb-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wide mb-4 border border-blue-100">
+            Step 1 of 6
+        </div>
+        <h1 class="text-3xl font-bold text-slate-900 mb-4 tracking-tight">Upload Data Files</h1>
+        <p class="text-slate-600 text-lg max-w-2xl mx-auto leading-relaxed">
+            Calculate <strong>CO and PO attainment</strong> as per <strong>NBA OBE</strong> guidelines. 
+            Please start by uploading the required Excel templates below.
+        </p>
+    </div>
 
-    <label class="mt-3">Marks Excel (NBA_Marks.xlsx)</label>
-    <input type="file" name="marks" required>
+    <!-- Upload Form -->
+    <form action="/upload" method="POST" enctype="multipart/form-data" class="space-y-6">
+        
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Config File Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300 relative group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-t-xl"></div>
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Configuration File</h3>
+                <p class="text-sm text-slate-500 mb-6 h-10">
+                    Includes CO/PO lists, mappings, assessment weightage, and targets.
+                </p>
+                
+                <label class="block">
+                    <span class="sr-only">Choose config file</span>
+                    <input type="file" name="config" required class="block w-full text-sm text-slate-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-indigo-50 file:text-indigo-700
+                        hover:file:bg-indigo-100
+                        cursor-pointer transition-colors
+                    "/>
+                </label>
+            </div>
 
-    <button class="btn btn-primary mt-3">Upload & Validate</button>
-</form>
+            <!-- Marks File Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-300 relative group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-t-xl"></div>
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Marks File</h3>
+                <p class="text-sm text-slate-500 mb-6 h-10">
+                    Contains assessment-wise student marks in the official format.
+                </p>
+                
+                <label class="block">
+                    <span class="sr-only">Choose marks file</span>
+                    <input type="file" name="marks" required class="block w-full text-sm text-slate-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-emerald-50 file:text-emerald-700
+                        hover:file:bg-emerald-100
+                        cursor-pointer transition-colors
+                    "/>
+                </label>
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="flex justify-center pt-4">
+            <button type="submit" class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                <span class="mr-2">Upload & Validate Files</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+            </button>
+        </div>
+
+    </form>
+
+    <!-- Note Box -->
+    <div class="mt-10 bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg shadow-sm">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-amber-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-amber-800">Important Note</h3>
+                <div class="mt-2 text-sm text-amber-700">
+                    <p>Ensure that you upload the <strong>official Excel templates</strong>. Incorrect sheet names, missing columns, or modified formats may cause validation errors.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

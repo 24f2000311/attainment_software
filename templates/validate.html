@@ -1,12 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
-<h4>Validation Status</h4>
 
-<ul>
-{% for msg in messages %}
-    <li>{{ msg }}</li>
-{% endfor %}
-</ul>
+<div class="max-w-2xl mx-auto text-center">
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-slate-900">Validation Successful</h2>
+        <p class="text-slate-500 mt-1">Your files have been processed successfully.</p>
+    </div>
 
-<a href="/co_attainment" class="btn btn-success">Proceed</a>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8 text-left">
+        <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Validation Log</h3>
+        <div class="space-y-3">
+            {% for msg in messages %}
+                <div class="flex items-start">
+                    <svg class="h-5 w-5 text-emerald-500 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-slate-700">{{ msg }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <a href="/co_attainment" class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+        Proceed to Attainment
+        <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 -mr-1 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+    </a>
+</div>
+
 {% endblock %}

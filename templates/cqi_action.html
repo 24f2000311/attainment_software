@@ -1,27 +1,64 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h3>CQI Action Plan Entry</h3>
+<div class="max-w-2xl mx-auto">
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-slate-900">CQI Action Plan Entry</h2>
+        <p class="text-slate-500 mt-1">Define corrective actions for Course Outcomes with low attainment.</p>
+    </div>
 
-<form method="post">
-    <label>Select Course Outcome (CO)</label>
-    <select name="co" class="form-control" required>
-        {% for co in weak_cos %}
-            <option value="{{ co.CO }}">{{ co.CO }}</option>
-        {% endfor %}
-    </select>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+        <form method="post" class="space-y-6">
+            
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Select Course Outcome (CO)
+                </label>
+                <div class="relative">
+                    <select name="co" required class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm py-2.5 px-3 bg-white">
+                        {% for co in weak_cos %}
+                            <option value="{{ co.CO }}">{{ co.CO }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <p class="mt-1 text-xs text-slate-500">Select the CO you want to address.</p>
+            </div>
 
-    <label class="mt-3">Cause of Low Attainment</label>
-    <textarea name="cause" class="form-control" required></textarea>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Cause of Low Attainment
+                </label>
+                <textarea name="cause" rows="3" required class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm p-3" placeholder="Describe why the target was not met..."></textarea>
+            </div>
 
-    <label class="mt-3">Corrective Action Planned</label>
-    <textarea name="action" class="form-control" required></textarea>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Corrective Action Planned
+                </label>
+                <textarea name="action" rows="3" required class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm p-3" placeholder="What steps will be taken to improve attainment?"></textarea>
+            </div>
 
-    <label class="mt-3">Expected Outcome</label>
-    <textarea name="outcome" class="form-control" required></textarea>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Expected Outcome
+                </label>
+                <textarea name="outcome" rows="3" required class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm p-3" placeholder="What is the expected result of this action?"></textarea>
+            </div>
 
-    <button class="btn btn-success mt-3">Save CQI Action</button>
-</form>
-
-<a href="/cqi_summary" class="btn btn-secondary mt-3">Summary</a>
+            <div class="pt-4 flex items-center justify-between">
+                
+                 <a href="/cqi_summary"class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
+                    Skip to Summary
+                </a>
+                
+                <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Save CQI Action
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

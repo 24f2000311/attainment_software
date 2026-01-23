@@ -15,6 +15,10 @@ def index():
 @main_bp.route('/upload', methods=['POST'])
 def upload():
     try:
+        
+        
+        state.cqi_actions = []
+        
         config_file = request.files['config']
         marks_file =  request.files['marks']
         
@@ -40,7 +44,7 @@ def upload():
         
         normalized_data = normalize_marks(marks_sheets, question_map, weights)
         state.cleaned_normalized_data = [clean_row(r) for r in normalized_data]
-        print(state.cleaned_normalized_data)
+
         
         return render_template('validate.html', messages=[ "Files uploaded successfully",
                     "Validation completed",

@@ -1,6 +1,6 @@
 def clean_row(row):
     return {
-        "Student_ID": int(row["Student_ID"]),
+        "Student_Name": row["Student_Name"],
         "Assessment": row["Assessment"],
         "Question": row["Question"],
         "CO": row["CO"],

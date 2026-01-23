@@ -16,8 +16,8 @@ def validate_config_sheets(sheets):
 
 def validate_marks_basic(marks_sheets):
     for sheet, df in marks_sheets.items():
-        if "Student_ID" not in df.columns:
-            raise ValueError(f"Student_ID missing in marks sheet: {sheet}")
+        if "Student_Name" not in df.columns:
+            raise ValueError(f"Student_Name missing in marks sheet: {sheet}")
 
         if df.empty:
             raise ValueError(f"No data in marks sheet: {sheet}")

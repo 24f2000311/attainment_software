@@ -73,11 +73,6 @@ def cqi_action_view():
 
 @cqi_bp.route("/cqi_summary")
 def cqi_summary_view():
-    if not state.cqi_actions:
-        return render_template(
-            "error.html",
-            error_message="No CQI actions recorded yet."
-        )
 
     return render_template(
         "cqi_summary.html",
