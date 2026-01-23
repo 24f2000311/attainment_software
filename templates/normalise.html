@@ -1,0 +1,14 @@
+
+<table class="table table-bordered">
+<tr>
+  <th>Student</th><th>Assessment</th><th>CO</th><th>Marks</th>
+</tr>
+{% for row in data %}
+<tr>
+  <td>{{ row.Student_ID }}</td>
+  <td>{{ row.Assessment }}</td>
+  <td>{{ row.CO }}</td>
+  <td>{{ row.Marks }}</td>
+</tr>
+{% endfor %}
+</table>

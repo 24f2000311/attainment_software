@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Validation Status</h4>
+
+<ul>
+{% for msg in messages %}
+    <li>{{ msg }}</li>
+{% endfor %}
+</ul>
+
+<a href="/co_attainment" class="btn btn-success">Proceed</a>
+{% endblock %}

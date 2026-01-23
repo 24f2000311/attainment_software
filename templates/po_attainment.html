@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Program Outcome (PO) Attainment</h3>
+
+<table class="table table-bordered table-striped mt-3">
+    <thead>
+        <tr>
+            <th>PO</th>
+            <th>Computed Value</th>
+            <th>Attainment Level</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for po, data in po_attainment.items() %}
+        <tr>
+            <td>{{ po }}</td>
+            <td>{{ data.PO_Value }}</td>
+            <td>Level {{ data.PO_Level }}</td>
+            <td>
+                {% if data.PO_Level >= 2 %}
+                    ✅ Attained
+                {% elif data.PO_Level == 1 %}
+                    ⚠ Marginal
+                {% else %}
+                    ❌ Not Attained
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="/cqi" class="btn btn-secondary mt-3">analyase/a>
+{% endblock %}

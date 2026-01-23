@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Report Generation</h3>
+<p>Select the report format:</p>
+
+<form method="post">
+    <button name="report_type" value="excel" class="btn btn-success">
+        Download Excel Report
+    </button>
+
+    <button name="report_type" value="pdf" class="btn btn-danger">
+        Download PDF Report
+    </button>
+</form>
+
+<a href="/" class="btn btn-secondary mt-3">Back</a>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>CQI Action Plan Entry</h3>
+
+<form method="post">
+    <label>Select Course Outcome (CO)</label>
+    <select name="co" class="form-control" required>
+        {% for co in weak_cos %}
+            <option value="{{ co.CO }}">{{ co.CO }}</option>
+        {% endfor %}
+    </select>
+
+    <label class="mt-3">Cause of Low Attainment</label>
+    <textarea name="cause" class="form-control" required></textarea>
+
+    <label class="mt-3">Corrective Action Planned</label>
+    <textarea name="action" class="form-control" required></textarea>
+
+    <label class="mt-3">Expected Outcome</label>
+    <textarea name="outcome" class="form-control" required></textarea>
+
+    <button class="btn btn-success mt-3">Save CQI Action</button>
+</form>
+
+<a href="/cqi_summary" class="btn btn-secondary mt-3">Summary</a>
+{% endblock %}

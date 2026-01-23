@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Upload Excel Files</h4>
+
+<form method="post" enctype="multipart/form-data" action={{ url_for('upload') }} >
+    <label>Configuration Excel (NBA_Config.xlsx)</label>
+    <input type="file" name="config" required>
+
+    <label class="mt-3">Marks Excel (NBA_Marks.xlsx)</label>
+    <input type="file" name="marks" required>
+
+    <button class="btn btn-primary mt-3">Upload & Validate</button>
+</form>
+{% endblock %}

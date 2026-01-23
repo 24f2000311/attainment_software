@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Course Outcome (CO) Attainment</h3>
+
+<table class="table table-bordered table-striped mt-3">
+    <thead>
+        <tr>
+            <th>CO</th>
+            <th>Attainment Level</th>
+            <th>% Students Achieved Target</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for co, data in co_attainment.items() %}
+        <tr>
+            <td>{{ co }}</td>
+            <td>Level {{ data.Attainment_Level }}</td>
+            <td>{{ data["Achieved_%"] }}%</td>
+            <td>
+                {% if data.Attainment_Level >= 2 %}
+                    ✅ Attained
+                {% elif data.Attainment_Level == 1 %}
+                    ⚠ Marginal
+                {% else %}
+                    ❌ Not Attained
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="/po-attainment" class="btn btn-primary mt-3">
+    Next: PO Attainment
+</a>
+{% endblock %}

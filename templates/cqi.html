@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Continuous Quality Improvement (CQI) – Gap Analysis</h3>
+
+{% if weak_cos|length == 0 %}
+    <p class="text-success">✅ All Course Outcomes have met the target attainment.</p>
+{% else %}
+    <p class="text-danger">❌ The following Course Outcomes did not meet the target:</p>
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>CO</th>
+                <th>Attainment Level</th>
+                <th>% Students Achieved</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for co in weak_cos %}
+            <tr>
+                <td>{{ co.CO }}</td>
+                <td>Level {{ co.Level }}</td>
+                <td>{{ co["Achieved_%"] }}%</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="/cqi-action" class="btn btn-warning mt-3">
+        Add CQI Action Plan
+    </a>
+{% endif %}
+
+<a href="/po-attainment" class="btn btn-secondary mt-3">Back</a>
+{% endblock %}

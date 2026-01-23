@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>CQI Summary Report</h3>
+
+<table class="table table-bordered table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Course Outcome (CO)</th>
+            <th>Cause of Low Attainment</th>
+            <th>Corrective Action</th>
+            <th>Expected Outcome</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for item in cqi_actions %}
+        <tr>
+            <td>{{ item.CO }}</td>
+            <td>{{ item.Cause }}</td>
+            <td>{{ item.Action }}</td>
+            <td>{{ item.Outcome }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="/cqi" class="btn btn-secondary mt-3">Back to CQI</a>
+<a href="/reports" class="btn btn-primary mt-3">Generate Reports</a>
+{% endblock %}
