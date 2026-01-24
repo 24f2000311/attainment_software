@@ -1,23 +1,12 @@
-from PyInstaller.utils.hooks import collect_submodules, collect_data_files
+# -*- mode: python ; coding: utf-8 -*-
 
-# Collect hidden imports and data files
-hidden_imports = []
-hidden_imports += collect_submodules('pandas')
-hidden_imports += collect_submodules('openpyxl')
-hidden_imports += collect_submodules('reportlab')
-hidden_imports += ['et_xmlfile']
-
-# Collect data files (especially for reportlab/fonts)
-datas = [('templates', 'templates'), ('static', 'static')]
-datas += collect_data_files('reportlab')
-datas += collect_data_files('openpyxl')
 
 a = Analysis(
     ['desktop_app.py'],
     pathex=[],
     binaries=[],
-    datas=datas,
-    hiddenimports=hidden_imports,
+    datas=[('templates', 'templates'), ('static', 'static')],
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
