@@ -17,6 +17,6 @@ app.register_blueprint(reports_bp)
 if __name__ == "__main__":
     app.run(
         port=5000,
-        debug=False,   # IMPORTANT for EXE
+        debug=True,   # IMPORTANT for EXE
         use_reloader=False
     )

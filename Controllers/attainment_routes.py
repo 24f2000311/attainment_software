@@ -3,6 +3,7 @@ from services.state import state
 from services.co_scores import calculate_co_scores, convert_to_percentage
 from services.co_attainment import calculate_co_attainment
 from services.po_attainment import calculate_po_attainment
+from services.co_scores import calculate_co_numeric_scores
 
 attainment_bp = Blueprint('attainment', __name__)
 
@@ -14,10 +15,14 @@ def co_attainment():
             error_message="Please upload and validate files first."
         )
 
+    # Student-wise CO % calculation
     co_scores = calculate_co_scores(state.cleaned_normalized_data)
     co_percentages = convert_to_percentage(co_scores)
 
-    # 3️⃣ CO attainment
+    # 🆕 CO numeric scores (0–3)
+    co_numeric_scores = calculate_co_numeric_scores(co_percentages)
+
+    # CO attainment level (existing logic)
     co_attainment_val = calculate_co_attainment(
         co_percentages,
         state.config_sheets["Attainment_Targets"]
@@ -25,8 +30,10 @@ def co_attainment():
 
     return render_template(
         "co_attainment.html",
-        co_attainment=co_attainment_val
+        co_attainment=co_attainment_val,
+        co_numeric_scores=co_numeric_scores
     )
+
 
 @attainment_bp.route("/po-attainment")
 def po_attainment_view():

@@ -26,6 +26,9 @@
                             Attainment Level
                         </th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+    CO Numeric Score
+</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                             % Students Achieved
                         </th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -44,6 +47,16 @@
                                 Level {{ data.Attainment_Level }}
                             </span>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                            {% if co_numeric_scores.get(co) is not none %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-semibold bg-indigo-100 text-indigo-800">
+                                    {{ co_numeric_scores[co] }} / 3
+                                </span>
+                            {% else %}
+                                <span class="text-slate-400">—</span>
+    {% endif %}
+                        </td>
+
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                             <div class="flex items-center">
                                 <span class="mr-2">{{ data["Achieved_%"] }}%</span>

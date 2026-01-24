@@ -1,11 +1,20 @@
 from flask import Blueprint, render_template, request
+from time import time
+
 from services.state import state
 from services.co_scores import calculate_co_scores, convert_to_percentage
 from services.co_attainment import calculate_co_attainment
+from services.po_attainment import calculate_po_attainment
 from services.cqi_gap import identify_co_gaps
+from services.cqi_web_charts import save_co_cqi_chart, save_po_cqi_chart
 
-cqi_bp = Blueprint('cqi', __name__)
 
+cqi_bp = Blueprint("cqi", __name__)
+
+
+# =========================
+# CQI GAP IDENTIFICATION
+# =========================
 @cqi_bp.route("/cqi")
 def cqi():
     if state.cleaned_normalized_data is None or state.config_sheets is None:
@@ -14,22 +23,25 @@ def cqi():
             error_message="Please upload and process files first."
         )
 
-    # Recompute CO attainment
     co_scores = calculate_co_scores(state.cleaned_normalized_data)
     co_percentages = convert_to_percentage(co_scores)
+
     co_attainment = calculate_co_attainment(
         co_percentages,
         state.config_sheets["Attainment_Targets"]
     )
 
-    # Identify gaps
     weak_cos = identify_co_gaps(co_attainment, target_level=2)
 
     return render_template(
         "cqi.html",
         weak_cos=weak_cos
     )
-    
+
+
+# =========================
+# CQI ACTION ENTRY
+# =========================
 @cqi_bp.route("/cqi-action", methods=["GET", "POST"])
 def cqi_action_view():
     if state.cleaned_normalized_data is None or state.config_sheets is None:
@@ -39,16 +51,11 @@ def cqi_action_view():
         )
 
     if request.method == "POST":
-        co = request.form.get("co")
-        cause = request.form.get("cause")
-        action = request.form.get("action")
-        outcome = request.form.get("outcome")
-
         state.cqi_actions.append({
-            "CO": co,
-            "Cause": cause,
-            "Action": action,
-            "Outcome": outcome
+            "CO": request.form.get("co"),
+            "Cause": request.form.get("cause"),
+            "Action": request.form.get("action"),
+            "Outcome": request.form.get("outcome")
         })
 
         return render_template(
@@ -56,9 +63,9 @@ def cqi_action_view():
             message="CQI Action Plan saved successfully."
         )
 
-    # GET request → show weak COs
     co_scores = calculate_co_scores(state.cleaned_normalized_data)
     co_percentages = convert_to_percentage(co_scores)
+
     co_attainment = calculate_co_attainment(
         co_percentages,
         state.config_sheets["Attainment_Targets"]
@@ -71,10 +78,40 @@ def cqi_action_view():
         weak_cos=weak_cos
     )
 
+
+# =========================
+# CQI SUMMARY (GRAPHS)
+# =========================
 @cqi_bp.route("/cqi_summary")
-def cqi_summary_view():
+def cqi_summary():
+
+    if state.cleaned_normalized_data is None or state.config_sheets is None:
+        return render_template(
+            "error.html",
+            error_message="Please upload and process files first."
+        )
+
+    # ---- CO ATTAINMENT ----
+    co_scores = calculate_co_scores(state.cleaned_normalized_data)
+    co_percentages = convert_to_percentage(co_scores)
+
+    co_attainment = calculate_co_attainment(
+        co_percentages,
+        state.config_sheets["Attainment_Targets"]
+    )
+
+    # ---- PO ATTAINMENT ----
+    po_attainment = calculate_po_attainment(
+        co_attainment,
+        state.config_sheets["CO_PO_Mapping"]
+    )
+
+    # ---- GENERATE WEB CHARTS (MATPLOTLIB) ----
+    save_co_cqi_chart(co_attainment, 2, "static/cqi_co.png")
+    save_po_cqi_chart(po_attainment, 2, "static/cqi_po.png")
 
     return render_template(
         "cqi_summary.html",
-        cqi_actions=state.cqi_actions
+        cqi_actions=state.cqi_actions,
+        now=int(time())  # cache-busting
     )

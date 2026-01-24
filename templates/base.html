@@ -126,13 +126,45 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 mt-auto">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-sm text-slate-500">
-                &copy; {{ now.year if now else '2025' }} Attainment Software. All rights reserved.
-            </p>
-        </div>
-    </footer>
+<footer class="bg-white border-t border-slate-200 mt-auto">
+    <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center space-y-1">
+        
+        <p class="text-xs text-slate-600 flex items-center justify-center gap-1">
+            By His Grace, 
+            <span class="font-medium">Hare Krishna</span>
+            <img 
+                src="{{ url_for('static', filename='icons/feather.png') }}" 
+                alt="Hare Krishna"
+                class="h-8 w-8 inline-block opacity-80"
+            />
+        </p>
+
+        <p class="text-xs text-slate-500">
+            Developed by 
+            <a href="https://www.linkedin.com/in/madhav-aghav/" 
+               target="_blank"
+               class="font-medium text-slate-700 hover:text-blue-600 transition">
+               Madhav
+            </a> 🦹‍♂️
+            &nbsp;|&nbsp;
+            Designed by 
+            <a href="https://www.linkedin.com/in/aditya-damre-b313442a4/" 
+               target="_blank"
+               class="font-medium text-slate-700 hover:text-blue-600 transition">
+               Aditya
+            </a> 🕵️‍♂️
+        </p>
+
+        <p class="text-[11px] text-slate-400">
+            &copy; {{ now.year if now else '2026' }} Attainment Software
+            | DYPCOE
+        </p>
+
+    </div>
+</footer>
+
+
+
 
     <!-- Simple Animation -->
     <style>
