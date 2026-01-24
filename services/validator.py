@@ -3,7 +3,8 @@ REQUIRED_CONFIG_SHEETS= [ "CO_List",
     "CO_PO_Mapping",
     "Assessment_Weightage",
     "Attainment_Targets",
-    "Question_CO_Map"
+    "Question_CO_Map",
+    "Settings"
 ]
 
 def validate_config_sheets(sheets):
