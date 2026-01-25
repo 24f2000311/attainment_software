@@ -4,13 +4,15 @@ import os
 import uuid
 from pathlib import Path
 import dotenv
-dotenv.load_dotenv()
+from services.state import resource_path
 
 
-# --- CONFIGURATION ---
-# EDIT THIS SECRET TO SECURE YOUR KEYS!
+dotenv.load_dotenv(resource_path(".env"))
+
+
+
 LICENSE_SECRET = os.getenv("LICENSE_SECRET")
-# ---------------------
+
 
 def get_machine_id():
     """Returns a unique ID for the current machine."""
@@ -29,11 +31,7 @@ def generate_key_hash(key_suffix):
     return hashlib.sha256(raw.encode()).hexdigest()[:8].upper()
 
 def validate_key_format(key):
-    """
-    Validates the format and checksum of a product key.
-    Format: AAAA-BBBB-CCCC-DDDD
-    Logic: AAAA is the hash checksum of the rest (BBBB-CCCC-DDDD) + SECRET
-    """
+
     parts = key.strip().upper().split('-')
     if len(parts) != 4:
         return False

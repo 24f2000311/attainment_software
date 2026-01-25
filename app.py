@@ -5,7 +5,8 @@ from services.license_service import LicenseService
 import mimetypes
 import os
 import dotenv
-dotenv.load_dotenv()
+# Load .env from the bundled resource path (works in EXE)
+dotenv.load_dotenv(resource_path(".env"))
 
 # Fix for CSS not loading in frozen app
 mimetypes.add_type('text/css', '.css')
