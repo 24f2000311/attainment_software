@@ -4,6 +4,7 @@ from services.state import state, UPLOAD_FOLDER
 from services.read_excels import read_excel_file
 from services.validator import validate_config_sheets, validate_marks_basic
 from services.normalizer import normalize_marks
+from services.validator import validate_config_sheets, validate_marks_basic, validate_assessment_weights
 from services.cleaning_normalized_data import clean_row
 
 main_bp = Blueprint('main', __name__)
@@ -33,6 +34,9 @@ def upload():
         
         validate_config_sheets(state.config_sheets)
         validate_marks_basic(marks_sheets)
+        
+        # New Strict Validation
+        validate_assessment_weights(state.config_sheets["Assessment_Weightage"])
         
         question_map = state.config_sheets["Question_CO_Map"]
         weights_df = state.config_sheets["Assessment_Weightage"]
