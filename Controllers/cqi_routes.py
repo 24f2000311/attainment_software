@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 from time import time
 
-from services.state import state
+from services.state import state, resource_path
 from services.co_scores import calculate_co_scores, convert_to_percentage
 from services.co_attainment import calculate_co_attainment
 from services.po_attainment import calculate_po_attainment
@@ -107,8 +107,8 @@ def cqi_summary():
     )
 
     # ---- GENERATE WEB CHARTS (MATPLOTLIB) ----
-    save_co_cqi_chart(co_attainment, 2, "static/cqi_co.png")
-    save_po_cqi_chart(po_attainment, 2, "static/cqi_po.png")
+    save_co_cqi_chart(co_attainment, 2, resource_path("static/cqi_co.png"))
+    save_po_cqi_chart(po_attainment, 2, resource_path("static/cqi_po.png"))
 
     return render_template(
         "cqi_summary.html",

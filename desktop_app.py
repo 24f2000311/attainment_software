@@ -15,6 +15,6 @@ if __name__ == "__main__":
         title="Attainment Software System",
         url="http://127.0.0.1:5525",
         width=1200,
-        height=800
+        height=800, # Enabled for debugging
     )
-    webview.start()
+    webview.start(debug=False)

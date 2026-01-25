@@ -34,6 +34,11 @@
                 
                 <!-- Right Side Links (Optional) -->
                 <div class="flex items-center space-x-4">
+                    {% if is_activated %}
+                        <span class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-semibold border border-green-200">
+                            Licensed ✅
+                        </span>
+                    {% endif %}
                     <a href="/" class="text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors">Home</a>
                     <a href="/reports" class="text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors">Reports</a>
                 </div>

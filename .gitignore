@@ -2,3 +2,9 @@
 build/
 
 node_modules
+.env
+generated_keys.txt
+tools/
+dist/
+__pycache__
+installer/
