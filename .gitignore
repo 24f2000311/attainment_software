@@ -1,6 +1,5 @@
 .venv/
 build/
-
 node_modules
 .env
 generated_keys.txt
@@ -9,3 +8,4 @@ dist/
 __pycache__
 installer/
 generated_test_data/
+versions/

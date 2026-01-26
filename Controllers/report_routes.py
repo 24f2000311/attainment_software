@@ -6,7 +6,7 @@ from tkinter import filedialog
 
 from services.state import state, REPORTS_FOLDER
 from services.co_scores import calculate_co_scores, convert_to_percentage
-from services.co_attainment import calculate_co_attainment
+from services.co_attainment import calculate_co_attainment, calculate_weighted_co_attainment
 from services.po_attainment import calculate_po_attainment
 from services.report_generator import (
     generate_co_report,
@@ -32,14 +32,19 @@ def reports_view():
         report_type = request.form.get("report_type")
 
         # ---------- RECOMPUTE ATTAINMENT ----------
-        co_scores = calculate_co_scores(state.cleaned_normalized_data)
-        co_percentages = convert_to_percentage(co_scores)
-
-        co_attainment = calculate_co_attainment(
-            co_percentages,
-            state.config_sheets["Attainment_Targets"]
+        # Use weighted attainment logic (Consolidated)
+        weighted_results = calculate_weighted_co_attainment(
+            state.cleaned_normalized_data,
+            state.config_sheets
         )
 
+        # Flatten to get just the Final attainment for reports/graphs
+        # This matches the structure expected by generate_co_report and calculate_po_attainment
+        co_attainment = {
+           co: val["Final"] for co, val in weighted_results.items()
+        }
+
+        # PO Attainment
         po_attainment = calculate_po_attainment(
             co_attainment,
             state.config_sheets["CO_PO_Mapping"]
@@ -92,9 +97,9 @@ def reports_view():
                     co_df,
                     po_df,
                     cqi_df,
-                    co_attainment,   # ✅ FIX
-                    po_attainment,   # ✅ FIX
-                    save_path        # ✅ FIX
+                    co_attainment,   
+                    po_attainment,   
+                    save_path        
                 )
 
             return render_template(

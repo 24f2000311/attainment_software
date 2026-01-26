@@ -17,7 +17,7 @@ app = Flask(
     template_folder=resource_path("templates"),
     static_folder=resource_path("static")
 )
-app.secret_key = os.getenv("FLASK_SECRET")  # Required for sessions/flash messages
+app.secret_key = os.getenv("FLASK_SECRET", os.urandom(24))  # Required for sessions/flash messages
 
 # Register Blueprints
 app.register_blueprint(main_bp)

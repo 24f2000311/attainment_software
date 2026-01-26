@@ -1,5 +1,5 @@
 from collections import defaultdict
-
+from services.co_scores import calculate_co_scores, convert_to_percentage
 
 def calculate_achieved_percentage(co_percentages, targets_df):
     """
@@ -82,3 +82,85 @@ def calculate_co_attainment(co_percentages, targets_df):
             "Achieved_%": round(achieved_percent, 2)
         }
     return results
+
+def process_attainment_subset_percentage(data, config_sheets):
+    """
+    Helper: Returns {CO: Achieved_%} for a subset of data
+    """
+    if not data:
+        return {}
+    scores = calculate_co_scores(data)
+    percentages = convert_to_percentage(scores)
+    return calculate_achieved_percentage(percentages, config_sheets["Attainment_Targets"])
+
+def calculate_weighted_co_attainment(cleaned_normalized_data, config_sheets):
+    """
+    Calculates CO attainment with separate Direct/Indirect weightings.
+    """
+    # 1. Get Settings (Global Weights)
+    try:
+        settings_df = config_sheets["Settings"]
+        settings = dict(zip(settings_df["Property"], settings_df["Value"]))
+        direct_weight = float(settings.get("Direct Weightage", 80)) / 100.0
+        indirect_weight = float(settings.get("Indirect Weightage", 20)) / 100.0
+        
+        if direct_weight > 1.0: direct_weight /= 100.0 
+        
+    except (KeyError, ValueError):
+        direct_weight = 0.8
+        indirect_weight = 0.2
+
+    # 2. Get Assessment Modes
+    assessment_df = config_sheets["Assessment_Weightage"]
+    if "Mode" in assessment_df.columns:
+        assessment_mode_map = dict(zip(assessment_df["Assessment"], assessment_df["Mode"]))
+    else:
+        assessment_mode_map = {}
+
+    # 3. Split Data
+    direct_data = []
+    indirect_data = []
+
+    for record in cleaned_normalized_data:
+        mode = assessment_mode_map.get(record["Assessment"], "Direct") 
+        if str(mode).strip().lower() == "indirect":
+            indirect_data.append(record)
+        else:
+            direct_data.append(record)
+
+    # 4. Calculate Achieved % for subsets (Metric Calculation Step)
+    direct_achieved = process_attainment_subset_percentage(direct_data, config_sheets)
+    indirect_achieved = process_attainment_subset_percentage(indirect_data, config_sheets)
+
+    # 5. Merge and Calculate Final Attainment Level
+    final_results = {}
+    all_cos = set(direct_achieved.keys()) | set(indirect_achieved.keys())
+    
+    targets_df = config_sheets["Attainment_Targets"]
+
+    for co in all_cos:
+        d_im = direct_achieved.get(co, 0.0)
+        i_im = indirect_achieved.get(co, 0.0)
+
+        # Weighted Average of the "Achieved Percentage" (e.g. 60% of students passed Direct)
+        final_achieved_percent = (d_im * direct_weight) + (i_im * indirect_weight)
+        
+        # Determine Level based on this weighted percentage
+        final_level = determine_attainment_level(final_achieved_percent, targets_df)
+
+        final_results[co] = {
+            "Direct": {
+                "Achieved_%": round(d_im, 2),
+                # Optional: Look up level just for display? 
+                "Attainment_Level": determine_attainment_level(d_im, targets_df)
+            },
+            "Indirect": {
+                "Achieved_%": round(i_im, 2),
+                "Attainment_Level": determine_attainment_level(i_im, targets_df)
+            },
+            "Final": {
+                "Achieved_%": round(final_achieved_percent, 2),
+                "Attainment_Level": final_level
+            }
+        }
+    return final_results
