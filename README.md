@@ -37,4 +37,4 @@
 *   **Weights Error**: Ensure weights are decimals (e.g. 0.2) not integers (20).
 
 ## Support
-For technical issues, contact the development team.
+For technical issues, fill the form https://forms.gle/NQ5b3gXhZQkiEtfo9
