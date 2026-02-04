@@ -5,10 +5,12 @@ from services.license_service import LicenseService
 import mimetypes
 import os
 import dotenv
-# Load .env from the bundled resource path (works in EXE)
+
+# Load .env from the bundled resource path (works in EXE) 
+#this is kinda buggy but works as user can see the .env file in the folder where exe is run
 dotenv.load_dotenv(resource_path(".env"))
 
-# Fix for CSS not loading in frozen app
+# Ensure correct MIME types for static files in EXE
 mimetypes.add_type('text/css', '.css')
 mimetypes.add_type('application/javascript', '.js')
 
@@ -17,6 +19,7 @@ app = Flask(
     template_folder=resource_path("templates"),
     static_folder=resource_path("static")
 )
+
 app.secret_key = os.getenv("FLASK_SECRET", os.urandom(24))  # Required for sessions/flash messages
 
 # Register Blueprints
@@ -38,6 +41,7 @@ def check_license():
 
 @app.context_processor
 def inject_license_status():
+    #injects the license status into all templates
     return dict(is_activated=LicenseService.is_activated())
 
 @app.errorhandler(Exception)

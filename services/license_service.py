@@ -15,7 +15,7 @@ LICENSE_SECRET = os.getenv("LICENSE_SECRET")
 
 
 def get_machine_id():
-    """Returns a unique ID for the current machine."""
+    """Returns a MAC Address based machine identifier."""
     return str(uuid.getnode())
 
 def get_license_file_path():
