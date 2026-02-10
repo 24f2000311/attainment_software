@@ -1,6 +1,16 @@
+"""
+Attainment Routes
+=================
+
+This Blueprint handles the display of Attainment results.
+Routes:
+- /co_attainment: Displays CO Attainment levels and numeric scores.
+- /po-attainment: Displays PO Attainment levels based on CO results.
+"""
+
 from flask import Blueprint, render_template
 from services.state import state
-from services.co_scores import calculate_co_scores, convert_to_percentage, calculate_co_numeric_scores
+from services.co_scores import calculate_co_scores, convert_to_percentage
 from services.co_attainment import calculate_co_attainment, calculate_weighted_co_attainment
 from services.po_attainment import calculate_po_attainment
 
@@ -8,6 +18,14 @@ attainment_bp = Blueprint('attainment', __name__)
 
 @attainment_bp.route("/co_attainment")
 def co_attainment():
+    """
+    Renders the Course Outcome (CO) Attainment page.
+    
+    1. Checks if data is loaded.
+    2. Calculates weighted CO attainment (Direct + Indirect).
+    3. Derives Numeric Scores (0-3) from the Final Attainment Levels.
+    4. Renders 'co_attainment.html'.
+    """
     if state.cleaned_normalized_data is None or state.config_sheets is None:
         return render_template(
             "error.html",
@@ -17,10 +35,12 @@ def co_attainment():
     # Use shared service function
     final_results = calculate_weighted_co_attainment(state.cleaned_normalized_data, state.config_sheets)
     
-    # Global numeric scores (kept on all data)
-    co_scores = calculate_co_scores(state.cleaned_normalized_data)
-    co_percentages = convert_to_percentage(co_scores) 
-    co_numeric_scores = calculate_co_numeric_scores(co_percentages)
+    # FIX: Use the Final Weighted Attainment Level as the Numeric Score
+    # This ensures consistency with the Attainment Level shown in reports/graphs
+    co_numeric_scores = {
+        co: val["Final"]["Attainment_Level"] 
+        for co, val in final_results.items()
+    }
 
     return render_template(
         "co_attainment.html",
@@ -31,6 +51,13 @@ def co_attainment():
 
 @attainment_bp.route("/po-attainment")
 def po_attainment_view():
+    """
+    Renders the Program Outcome (PO) Attainment page.
+    
+    1. Re-calculates CO attainment.
+    2. Uses CO-PO mapping to compute PO values.
+    3. Renders 'po_attainment.html'.
+    """
     if state.cleaned_normalized_data is None or state.config_sheets is None:
         return render_template(
             "error.html",

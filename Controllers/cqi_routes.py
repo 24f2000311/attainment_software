@@ -1,9 +1,20 @@
+"""
+CQI Routes
+==========
+
+This Blueprint handles Continuous Quality Improvement (CQI) features.
+
+Routes:
+- /cqi: Gap Identification (COs below target level).
+- /cqi-action: Entry form for remedial actions.
+- /cqi_summary: Dashboard showing improvements and action plans.
+"""
+
 from flask import Blueprint, render_template, request
 from time import time
 
 from services.state import state, resource_path
-from services.co_scores import calculate_co_scores, convert_to_percentage
-from services.co_attainment import calculate_co_attainment, calculate_weighted_co_attainment
+from services.co_attainment import calculate_weighted_co_attainment
 from services.po_attainment import calculate_po_attainment
 from services.cqi_gap import identify_co_gaps
 from services.cqi_web_charts import save_co_cqi_chart, save_po_cqi_chart

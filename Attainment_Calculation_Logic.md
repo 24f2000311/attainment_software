@@ -27,27 +27,24 @@ The Course Outcome attainment is calculated in several steps.
 
 ### 3.1 Normalization & Weighting
 
-For every question answered by a student, the system calculates a weighted score.
+For every question answered by a student, the system calculates a weighted score based on the **CO-specific Assessment Weight**.
+
+**New Architecture:**
+*   Weights are defined per **(Assessment, CO)** pair in `CO_Weightage` sheet.
+*   For each CO, the sum of weights across all assessments **must be exactly 1.0**.
 
 **Formula per Question:**
-$$ Score_{Question} = \left( \frac{Marks Obtained}{Max Marks} \right) \times Assessment Weight $$
-
-*   **Assessment Weight**: The weight assigned to the assessment (e.g., 0.3) in the config.
-*   *Note*: The weight is applied to **each** question mapped to the CO.
+$$ Score_{Question} = \left( \frac{Marks Obtained}{Max Marks} \right) \times Weight_{Assessment, CO} $$
 
 ### 3.2 Aggregation (CO Score)
 
-The system calculates the final score for a CO by summing the weighted scores and **normalizing** them against the total weight of assessments mapped to that CO.
+The system sums the weighted scores for all questions mapped to a specific CO for a student.
+Since the weights for a CO already sum to 1.0, **no further normalization is needed**.
 
 **Formula per Student-CO:**
-$$ Score_{CO} = \frac{\sum Score_{Question}}{\sum Weight_{Question}} $$
+$$ Score_{CO} = \sum Score_{Question} $$
 
-*   **Numerator**: Sum of weighted scores obtained by the student for this CO.
-*   **Denominator**: Sum of the weights of all questions assessing this CO.
-
-> **Important**: The score is now **normalized**.
-> *   If CO1 is *only* assessed in "Internal 1" (Weight 0.1) and a student scores full marks, their CO score will be **100% (1.0)**, not 10%.
-> *   This ensures that students are evaluated based on their performance on the *attempted* portion of the CO, rather than an absolute course weight.
+> **Note**: This ensures that if a student scores full marks in all assessments for a CO, their final score is exactly 100% (or 1.0).
 
 ### 3.3 Percentage Conversion
 
