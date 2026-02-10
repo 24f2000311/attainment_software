@@ -37,14 +37,17 @@ $$ Score_{Question} = \left( \frac{Marks Obtained}{Max Marks} \right) \times Ass
 
 ### 3.2 Aggregation (CO Score)
 
-The system sums the weighted scores for all questions mapped to a specific CO for a student.
+The system calculates the final score for a CO by summing the weighted scores and **normalizing** them against the total weight of assessments mapped to that CO.
 
 **Formula per Student-CO:**
-$$ Score_{CO} = \sum Score_{Question} $$
+$$ Score_{CO} = \frac{\sum Score_{Question}}{\sum Weight_{Question}} $$
 
-> **Important**: The score is calculated relative to the **Total Course Weight (1.0)**.
-> *   If CO1 is *only* assessed in "Internal 1" (Weight 0.1), the maximum possible score for CO1 is **10 (10%)**.
-> *   The system does **not** normalize the score based on the "Max Possible Score for that CO". It assumes distribution across the full course.
+*   **Numerator**: Sum of weighted scores obtained by the student for this CO.
+*   **Denominator**: Sum of the weights of all questions assessing this CO.
+
+> **Important**: The score is now **normalized**.
+> *   If CO1 is *only* assessed in "Internal 1" (Weight 0.1) and a student scores full marks, their CO score will be **100% (1.0)**, not 10%.
+> *   This ensures that students are evaluated based on their performance on the *attempted* portion of the CO, rather than an absolute course weight.
 
 ### 3.3 Percentage Conversion
 

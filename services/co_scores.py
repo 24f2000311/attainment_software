@@ -2,13 +2,49 @@ from collections import defaultdict
 
 def calculate_co_scores(normalized_data):
     co_scores = defaultdict(float)
+    co_total_weight = defaultdict(float)
+
+    # 1. Calculate Score & Track Total Weight per CO
+    # We need to find the unique "Assessment-Question" weight for each CO to normalize properly.
+    # A set of (Assessment, Question, CO) guarantees we simply sum the weights of all questions belonging to a CO.
+    
+    unique_questions = set()
 
     for row in normalized_data:
-        key = (row["Student_Name"], row["CO"])
-        score = (row["Marks"] / row["Max_Marks"]) * row["Weight"]
+        student = row["Student_Name"]
+        co = row["CO"]
+        assessment = row["Assessment"]
+        question = row["Question"]
+        weight = row["Weight"]
+        
+        # Add to student score
+        key = (student, co)
+        score = (row["Marks"] / row["Max_Marks"]) * weight
         co_scores[key] += score
 
-    return co_scores
+        # Track total weight for this CO (globally for the course)
+        # We assume every student takes the same assessments. 
+        # If specific students miss assessments, they get 0, which is correct (they lost that weight).
+        # We just need to know "What was the total possible weight for CO1?"
+        # We use a set to avoid double counting if multiple students have the same row data structure (which they do).
+        
+        uniq_key = (assessment, question, co)
+        if uniq_key not in unique_questions:
+            co_total_weight[co] += weight
+            unique_questions.add(uniq_key)
+
+    # 2. Normalize Scores
+    # Final Score = (Sum of Weighted Scores) / (Total Weight Allocated to CO)
+    
+    final_scores = {}
+    for (student, co), raw_score in co_scores.items():
+        total_possible = co_total_weight.get(co, 1.0) # Avoid div by 0, though shouldn't happen if data exists
+        if total_possible == 0:
+            final_scores[(student, co)] = 0.0
+        else:
+            final_scores[(student, co)] = raw_score / total_possible
+
+    return final_scores
 
 
 def convert_to_percentage(co_scores):
