@@ -147,6 +147,6 @@ def reports_view():
             path = os.path.join(REPORTS_FOLDER, "NBA_Attainment_Report.xlsx")
             with pd.ExcelWriter(path, engine="openpyxl") as writer:
                 co_df.to_excel(writer, sheet_name="CO_Attainment", index=False)
-            )
+        
 
     return render_template("reports.html")

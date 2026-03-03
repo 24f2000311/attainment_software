@@ -73,7 +73,8 @@ def normalize_marks(marks_sheets, question_map, co_weights):
 
                 # Ensure marks are numeric
                 try:
-                    marks = float(marks)
+                    # Parse as float first to handle "8.0", then round to nearest int
+                    marks = int(round(float(marks)))
                 except (ValueError, TypeError):
                      # Log warning or skip? For strictness, let's raise error or set to 0.
                      # Setting to 0 is safer for "Ab" (Absent) but "Ab" usually is NaN or string.
