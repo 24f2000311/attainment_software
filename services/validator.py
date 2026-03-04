@@ -34,6 +34,20 @@ def validate_config_sheets(sheets):
     
     if missing_sheets:
         raise ValueError(f'Missing required sheets in config file: {", ".join(missing_sheets)}')
+        
+    co_list_df = sheets.get("CO_List")
+    if co_list_df is not None:
+        if "Target" not in co_list_df.columns:
+            raise ValueError("CO_List sheet missing required 'Target' column. Please set targets for all COs.")
+        if co_list_df["Target"].isna().any():
+            raise ValueError("Target values must be set for all COs in the CO_List sheet.")
+            
+    po_list_df = sheets.get("PO_List")
+    if po_list_df is not None:
+        if "Target" not in po_list_df.columns:
+            raise ValueError("PO_List sheet missing required 'Target' column. Please set targets for all POs.")
+        if po_list_df["Target"].isna().any():
+            raise ValueError("Target values must be set for all POs in the PO_List sheet.")
     
     return True
 

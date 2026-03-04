@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-def save_co_cqi_chart(co_attainment, target_level, output_path):
+def save_co_cqi_chart(co_attainment, target_levels, output_path):
     labels = sorted(co_attainment.keys())
     achieved = [co_attainment[c]["Attainment_Level"] for c in labels]
-    target = [target_level] * len(labels)
+    target = [float(target_levels.get(c, 2.0)) for c in labels]
 
     x = np.arange(len(labels))
     width = 0.35
@@ -28,10 +28,10 @@ def save_co_cqi_chart(co_attainment, target_level, output_path):
     plt.close()
 
 
-def save_po_cqi_chart(po_attainment, target_level, output_path):
+def save_po_cqi_chart(po_attainment, target_levels, output_path):
     labels = sorted(po_attainment.keys())
     achieved = [po_attainment[p]["PO_Level"] for p in labels]
-    target = [target_level] * len(labels)
+    target = [float(target_levels.get(p, 2.0)) for p in labels]
 
     x = np.arange(len(labels))
     width = 0.35

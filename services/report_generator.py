@@ -7,7 +7,7 @@ def generate_co_report(co_attainment):
         level = data["Attainment_Level"]
         status = (
             "Attained" if level >= 2
-            else "Marginal" if level == 1
+            else "Marginal" if level >= 1
             else "Not Attained"
         )
 
@@ -28,7 +28,7 @@ def generate_po_report(po_attainment):
         level = data["PO_Level"]
         status = (
             "Attained" if level >= 2
-            else "Marginal" if level == 1
+            else "Marginal" if level >= 1
             else "Not Attained"
         )
 

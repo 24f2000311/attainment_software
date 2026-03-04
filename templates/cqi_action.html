@@ -16,8 +16,8 @@
                 </label>
                 <div class="relative">
                     <select name="co" required class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm py-2.5 px-3 bg-white">
-                        {% for co in weak_cos %}
-                            <option value="{{ co.CO }}">{{ co.CO }}</option>
+                        {% for co in all_cos %}
+                            <option value="{{ co.CO }}">{{ co.CO }}{% if not co.is_weak %} (Attained){% endif %}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -46,17 +46,25 @@
             </div>
 
             <div class="pt-4 flex items-center justify-between">
-                
-                 <a href="/cqi_summary"class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
-                    Skip to Summary
+                <a href="/cqi" class="text-sm font-medium text-slate-600 hover:text-slate-900 flex items-center transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Back to Gap Analysis
                 </a>
                 
-                <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Save CQI Action
-                </button>
+                <div class="flex space-x-4 items-center">
+                    <a href="/cqi_summary" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors mr-2">
+                        Skip to Summary
+                    </a>
+                    
+                    <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Save CQI Action
+                    </button>
+                </div>
             </div>
         </form>
     </div>

@@ -60,8 +60,6 @@ def calculate_achieved_percentage(co_percentages, targets_df):
             achieved_results[co] = 0.0
             continue
             
-        # Get threshold from first row of targets (Standard Assumption)
-        # TODO: Support variable thresholds per level if needed.
         reference_min_marks = targets_df.iloc[0]["Min_Marks_%"] 
         
         achieved_count = sum(p >= reference_min_marks for p in percents)
@@ -73,7 +71,8 @@ def calculate_achieved_percentage(co_percentages, targets_df):
 
 def determine_attainment_level(achieved_percent, targets_df):
     """
-    Determines the Attainment Level (0-3) based on the percentage of students who achieved the target.
+    Determines the Attainment Level (0.00-3.00) based on the percentage of students who achieved the target.
+    Interpolates continuously between levels based on the configured thresholds in `Attainment_Targets`.
     
     Args:
         achieved_percent (float): Percentage of class meeting the threshold (e.g., 72.5%)
@@ -82,17 +81,47 @@ def determine_attainment_level(achieved_percent, targets_df):
                                    - Min_Students_% (e.g., 70, 60, 50)
                                    
     Returns:
-        int: The highest level met (3, 2, 1, or 0).
+        float: The interpolated attainment level (e.g. 2.51, 1.85, 0.40).
     """
-    # Sort targets high-to-low to find the highest match first
-    for _, row in targets_df.sort_values("Level", ascending=False).iterrows():
-        level = int(row["Level"])
-        min_students = row["Min_Students_%"]
-
-        if achieved_percent >= min_students:
-            return level
-            
-    return 0
+    targets_df = targets_df.sort_values("Level", ascending=True)
+    
+    levels_data = []
+    for _, row in targets_df.iterrows():
+        levels_data.append((int(row["Level"]), float(row["Min_Students_%"])))
+        
+    if not levels_data:
+        return 0.0
+        
+    max_level, max_threshold = levels_data[-1]
+    
+    if achieved_percent >= max_threshold:
+        return float(max_level)
+        
+    # Add base level (0, 0.0) for interpolation below the first threshold
+    levels_data.insert(0, (0, 0.0))
+    
+    for i in range(len(levels_data) - 1):
+        curr_level, curr_threshold = levels_data[i]
+        next_level, next_threshold = levels_data[i+1]
+        
+        if curr_threshold <= achieved_percent < next_threshold:
+            diff_thresh = next_threshold - curr_threshold
+            if diff_thresh == 0:
+                return float(curr_level)
+                
+            if curr_level == 0:
+                base_val = 0.01
+            elif curr_level == 1:
+                base_val = 1.01
+            elif curr_level == 2:
+                base_val = 2.01
+            else:
+                base_val = float(curr_level) + 0.01
+                
+            interpolated = base_val + 0.99 * (achieved_percent - curr_threshold) / diff_thresh
+            return round(interpolated, 2)
+                
+    return 0.0
 
 
 def calculate_co_attainment(co_percentages, targets_df):

@@ -6,7 +6,8 @@ from pathlib import Path
 def resource_path(relative_path: str) -> str:
     if getattr(sys, 'frozen', False):
         return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(root_dir, relative_path)
 
 
 #used for getting the user data directory

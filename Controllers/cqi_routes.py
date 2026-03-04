@@ -44,12 +44,28 @@ def cqi():
     final_co_attainment = {
        co: val["Final"] for co, val in weighted_results.items()
     }
+    
+    co_list_df = state.config_sheets["CO_List"]
+    co_targets = dict(zip(co_list_df["CO_ID"], co_list_df["Target"]))
 
-    weak_cos = identify_co_gaps(final_co_attainment, target_level=2)
+    all_cos = []
+    for co, data in final_co_attainment.items():
+        target = float(co_targets.get(co, 2.0))
+        all_cos.append({
+            "CO": co,
+            "Level": data["Attainment_Level"],
+            "Achieved_%": data["Achieved_%"],
+            "Target": target,
+            "is_weak": data["Attainment_Level"] < target
+        })
+    
+    all_cos.sort(key=lambda x: x["CO"])
+    weak_cos = [c for c in all_cos if c["is_weak"]]
 
     return render_template(
         "cqi.html",
-        weak_cos=weak_cos
+        weak_cos=weak_cos,
+        all_cos=all_cos
     )
 
 
@@ -86,12 +102,25 @@ def cqi_action_view():
     final_co_attainment = {
        co: val["Final"] for co, val in weighted_results.items()
     }
+    
+    co_list_df = state.config_sheets["CO_List"]
+    co_targets = dict(zip(co_list_df["CO_ID"], co_list_df["Target"]))
 
-    weak_cos = identify_co_gaps(final_co_attainment, target_level=2)
+    all_cos = []
+    for co, data in final_co_attainment.items():
+        target = float(co_targets.get(co, 2.0))
+        all_cos.append({
+            "CO": co,
+            "Level": data["Attainment_Level"],
+            "Achieved_%": data["Achieved_%"],
+            "Target": target,
+            "is_weak": data["Attainment_Level"] < target
+        })
+    all_cos.sort(key=lambda x: x["CO"])
 
     return render_template(
         "cqi_action.html",
-        weak_cos=weak_cos
+        all_cos=all_cos
     )
 
 
@@ -122,10 +151,16 @@ def cqi_summary():
         final_co_attainment,
         state.config_sheets["CO_PO_Mapping"]
     )
+    
+    co_list_df = state.config_sheets["CO_List"]
+    co_targets = dict(zip(co_list_df["CO_ID"], co_list_df["Target"]))
+    
+    po_list_df = state.config_sheets["PO_List"]
+    po_targets = dict(zip(po_list_df["PO_ID"], po_list_df["Target"]))
 
     # ---- GENERATE WEB CHARTS (MATPLOTLIB) ----
-    save_co_cqi_chart(final_co_attainment, 2, resource_path("static/cqi_co.png"))
-    save_po_cqi_chart(po_attainment, 2, resource_path("static/cqi_po.png"))
+    save_co_cqi_chart(final_co_attainment, co_targets, resource_path("static/cqi_co.png"))
+    save_po_cqi_chart(po_attainment, po_targets, resource_path("static/cqi_po.png"))
 
     return render_template(
         "cqi_summary.html",
