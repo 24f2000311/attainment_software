@@ -43,17 +43,25 @@
                             {{ data.PO_Value }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-slate-100 text-slate-800">
-                                Level {{ data.PO_Level }}
-                            </span>
+                            {% set score = data.PO_Level %}
+                            {% if score > 2 %}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-sm">Level 3</span>
+                            {% elif score > 1 %}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200 shadow-sm">Level 2</span>
+                            {% elif score > 0 %}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-100 text-red-800 border border-red-200 shadow-sm">Level 1</span>
+                            {% else %}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-200 shadow-sm">Level 0</span>
+                            {% endif %}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            {% if data.PO_Level >= 2 %}
+                            {% set target = po_targets.get(po, 2.0)|float %}
+                            {% if data.PO_Level >= target %}
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
                                     <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-emerald-400" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" /></svg>
                                     Attained
                                 </span>
-                            {% elif data.PO_Level == 1 %}
+                            {% elif data.PO_Level >= (target / 2) %}
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
                                     <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-amber-400" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" /></svg>
                                     Marginal

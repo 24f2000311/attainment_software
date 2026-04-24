@@ -28,6 +28,8 @@ def generate_pdf_report(
     cqi_df,
     co_attainment,
     po_attainment,
+    co_targets,
+    po_targets,
     output_path
 ):
     """
@@ -85,10 +87,10 @@ def generate_pdf_report(
     elements.append(Spacer(1, 15))
 
     # ---- CQI GRAPHS (ReportLab) ----
-    elements.append(build_co_cqi_graph(co_attainment, target_level=2))
+    elements.append(build_co_cqi_graph(co_attainment, co_targets))
     elements.append(Spacer(1, 20))
 
-    elements.append(build_po_cqi_graph(po_attainment, target_level=2))
+    elements.append(build_po_cqi_graph(po_attainment, po_targets))
     elements.append(Spacer(1, 20))
 
     # ---- CQI TABLE ----

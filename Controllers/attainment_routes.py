@@ -13,6 +13,11 @@ from services.state import state
 from services.co_scores import calculate_co_scores, convert_to_percentage
 from services.co_attainment import calculate_co_attainment, calculate_weighted_co_attainment
 from services.po_attainment import calculate_po_attainment
+import re
+
+def natural_sort_key(s):
+    return [int(text) if text.isdigit() else text.lower()
+            for text in re.split('([0-9]+)', str(s))]
 
 attainment_bp = Blueprint('attainment', __name__)
 
@@ -35,17 +40,16 @@ def co_attainment():
     # Use shared service function
     final_results = calculate_weighted_co_attainment(state.cleaned_normalized_data, state.config_sheets)
     
-    # FIX: Use the Final Weighted Attainment Level as the Numeric Score
-    # This ensures consistency with the Attainment Level shown in reports/graphs
-    co_numeric_scores = {
-        co: val["Final"]["Attainment_Level"] 
-        for co, val in final_results.items()
-    }
+    # Sort final_results by CO keys naturally (CO1, CO2, CO10)
+    final_results = dict(sorted(final_results.items(), key=lambda item: natural_sort_key(item[0])))
+    
+    co_list_df = state.config_sheets["CO_List"]
+    co_targets = dict(zip(co_list_df["CO_ID"], co_list_df["Target"]))
 
     return render_template(
         "co_attainment.html",
         co_attainment=final_results,
-        co_numeric_scores=co_numeric_scores 
+        co_targets=co_targets
     )
 
 
@@ -79,7 +83,14 @@ def po_attainment_view():
         state.config_sheets["CO_PO_Mapping"]
     )
 
+    # Sort POs naturally
+    po_attainment_val = dict(sorted(po_attainment_val.items(), key=lambda item: natural_sort_key(item[0])))
+
+    po_list_df = state.config_sheets["PO_List"]
+    po_targets = dict(zip(po_list_df["PO_ID"], po_list_df["Target"]))
+
     return render_template(
         "po_attainment.html",
-        po_attainment=po_attainment_val
+        po_attainment=po_attainment_val,
+        po_targets=po_targets
     )

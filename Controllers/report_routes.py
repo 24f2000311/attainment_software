@@ -75,9 +75,15 @@ def reports_view():
             state.config_sheets["CO_PO_Mapping"]
         )
 
+        co_list_df = state.config_sheets["CO_List"]
+        co_targets = dict(zip(co_list_df["CO_ID"], co_list_df["Target"]))
+
+        po_list_df = state.config_sheets["PO_List"]
+        po_targets = dict(zip(po_list_df["PO_ID"], po_list_df["Target"]))
+
         # ---------- DATAFRAMES ----------
-        co_df = generate_co_report(co_attainment)
-        po_df = generate_po_report(po_attainment)
+        co_df = generate_co_report(co_attainment, co_targets)
+        po_df = generate_po_report(po_attainment, po_targets)
         cqi_df = generate_cqi_report(state.cqi_actions)
 
         # ---------- SAVE DIALOG ----------
@@ -127,6 +133,8 @@ def reports_view():
                     cqi_df,
                     co_attainment,   
                     po_attainment,   
+                    co_targets,
+                    po_targets,
                     save_path        
                 )
 

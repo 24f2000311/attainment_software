@@ -42,7 +42,18 @@ def normalize_marks(marks_sheets, question_map, co_weights):
     """
     normalized = []
 
+    # Map cleaning against trailing spaces
+    question_map["Assessment"] = question_map["Assessment"].astype(str).str.strip()
+    question_map["Question"] = question_map["Question"].astype(str).str.strip()
+
+    co_weights = {
+        (str(k[0]).strip(), str(k[1]).strip() if isinstance(k[1], str) else k[1]): v 
+        for k, v in co_weights.items()
+    }
+
     for assessment, df in marks_sheets.items():
+        assessment = str(assessment).strip()
+        df.columns = df.columns.astype(str).str.strip()
         # Iterate over each student row
         for _, row in df.iterrows():
             student = row.get("Student_Name")
@@ -56,11 +67,6 @@ def normalize_marks(marks_sheets, question_map, co_weights):
                 if question == "Student_Name":
                     continue
 
-                # Skip empty marks (absent students)
-                marks = row.get(question)
-                if pd.isna(marks):
-                    continue
-
                 # CO mapping lookup: Find which CO this Question belongs to
                 q_map = question_map[
                     (question_map["Assessment"] == assessment) &
@@ -71,17 +77,18 @@ def normalize_marks(marks_sheets, question_map, co_weights):
                     # Question not mapped in config, skip it
                     continue
 
-                # Ensure marks are numeric
-                try:
-                    # Parse as float first to handle "8.0", then round to nearest int
-                    marks = int(round(float(marks)))
-                except (ValueError, TypeError):
-                     # Log warning or skip? For strictness, let's raise error or set to 0.
-                     # Setting to 0 is safer for "Ab" (Absent) but "Ab" usually is NaN or string.
-                     # Let's skip non-numeric to be safe unless it's a critical error.
-                     continue
+                # Treat empty, absent, or unparseable marks as 0
+                marks = row.get(question)
+                if pd.isna(marks):
+                    marks = 0
+                else:
+                    try:
+                        # Parse as float first to handle "8.0", then round to nearest int
+                        marks = int(round(float(marks)))
+                    except (ValueError, TypeError):
+                        marks = 0
 
-                co_id = q_map.iloc[0]["CO_ID"]
+                co_id = str(q_map.iloc[0]["CO_ID"]).strip()
                 
                 # Check for CO-wise weight configuration
                 if (assessment, co_id) not in co_weights:

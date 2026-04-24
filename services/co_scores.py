@@ -13,12 +13,14 @@ def calculate_co_scores(normalized_data):
     """
     Aggregates student scores for each CO based on weighted assessments.
     
-    Formula:
-        Score += (Marks_Obtained / Max_Marks) * Weightage
+    Groups marks by the same Assessment & CO for a given student so that
+    the defined configuration weight is only applied once to the sum of 
+    those marks, not excessively multiplied per individual question.
         
     Args:
         normalized_data (list): List of dictionaries containing:
                                 - Student_Name
+                                - Assessment
                                 - CO
                                 - Marks
                                 - Max_Marks
@@ -28,18 +30,23 @@ def calculate_co_scores(normalized_data):
         dict: A dictionary mapping (Student, CO) tuples to their aggregated weighted score (float).
               {(Student_Name, CO_ID): Score}
     """
-    co_scores = defaultdict(float)
-
+    # 1. Aggregate Marks and Max_Marks per Student, Assessment, and CO
+    agg_data = defaultdict(lambda: {"Marks": 0.0, "Max_Marks": 0.0, "Weight": 0.0})
     for row in normalized_data:
-        # Create a unique key for each student-CO pair
-        key = (row["Student_Name"], row["CO"])
+        key = (row["Student_Name"], row["Assessment"], row["CO"])
+        agg_data[key]["Marks"] += row["Marks"]
+        agg_data[key]["Max_Marks"] += row["Max_Marks"]
+        agg_data[key]["Weight"] = row["Weight"]  # Same weight applies to the whole Assessment-CO group
         
-        # Calculate weighted contribution of this assessment question
-        # If a question is worth 30% of the CO (Weight=0.3), and student gets 10/10,
-        # they get 0.3 points added to their CO score.
-        contribution = (row["Marks"] / row["Max_Marks"]) * row["Weight"]
-        
-        co_scores[key] += contribution
+    # 2. Calculate final CO score using the aggregated fractions
+    co_scores = defaultdict(float)
+    for (student, assessment, co), data in agg_data.items():
+        if data["Max_Marks"] > 0:
+            contribution = (data["Marks"] / data["Max_Marks"]) * data["Weight"]
+        else:
+            contribution = 0.0
+            
+        co_scores[(student, co)] += contribution
 
     return co_scores
 

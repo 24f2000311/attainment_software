@@ -275,25 +275,28 @@ def calculate_weighted_co_attainment(cleaned_normalized_data, config_sheets):
         d_im = direct_achieved.get(co, 0.0)
         i_im = indirect_achieved.get(co, 0.0)
 
-        # Weighted Average of the "Achieved Percentage" (e.g. 60% of students passed Direct)
+        # Calculate levels independently first
+        d_level = determine_attainment_level(d_im, targets_df)
+        i_level = determine_attainment_level(i_im, targets_df)
+
+        # Weighted Average of the "Achieved Percentage"
         final_achieved_percent = (d_im * direct_weight) + (i_im * indirect_weight)
         
-        # Determine Level based on this weighted percentage
-        final_level = determine_attainment_level(final_achieved_percent, targets_df)
+        # Final Level is the weighted average of the Direct and Indirect Levels
+        final_level = (d_level * direct_weight) + (i_level * indirect_weight)
 
         final_results[co] = {
             "Direct": {
                 "Achieved_%": round(d_im, 2),
-                # Optional: Look up level just for display? 
-                "Attainment_Level": determine_attainment_level(d_im, targets_df)
+                "Attainment_Level": d_level
             },
             "Indirect": {
                 "Achieved_%": round(i_im, 2),
-                "Attainment_Level": determine_attainment_level(i_im, targets_df)
+                "Attainment_Level": i_level
             },
             "Final": {
                 "Achieved_%": round(final_achieved_percent, 2),
-                "Attainment_Level": final_level
+                "Attainment_Level": round(final_level, 2)
             }
         }
     return final_results

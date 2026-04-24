@@ -35,10 +35,10 @@ def _build_bar_chart(labels, achieved, target, title, max_level=3):
     return drawing
 
 
-def build_co_cqi_graph(co_attainment, target_level=2):
+def build_co_cqi_graph(co_attainment, co_targets):
     labels = sorted(co_attainment.keys())
     achieved = [co_attainment[c]["Attainment_Level"] for c in labels]
-    target = [target_level] * len(labels)
+    target = [float(co_targets.get(c, 2.0)) for c in labels]
 
     return _build_bar_chart(
         labels, achieved, target,
@@ -46,10 +46,10 @@ def build_co_cqi_graph(co_attainment, target_level=2):
     )
 
 
-def build_po_cqi_graph(po_attainment, target_level=2):
+def build_po_cqi_graph(po_attainment, po_targets):
     labels = sorted(po_attainment.keys())
     achieved = [po_attainment[p]["PO_Level"] for p in labels]
-    target = [target_level] * len(labels)
+    target = [float(po_targets.get(p, 2.0)) for p in labels]
 
     return _build_bar_chart(
         labels, achieved, target,
