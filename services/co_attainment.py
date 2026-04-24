@@ -144,47 +144,98 @@ def process_attainment_subset_percentage(data, config_sheets):
     """
     Processes a subset of data (e.g., only Direct assessments) to calculate achievement percentage.
     
-    IMPORTANT:
-    This function normalizes scores against the TOTAL WEIGHT of the subset.
-    If a student scores 100% in a subset that only had 0.8 weight, their raw score is 0.8.
-    We normalize this back to 1.0 (100%) so that attainment thresholds work correctly.
+    This function calculates the percentage of students meeting the target threshold
+    using a Question-wise approach:
+    1. Calculate achievement percentage per Question.
+    2. Average the question achievement percentages per (Assessment, CO).
+    3. Compute the final weighted average for each CO using the configured assessment weights.
     
     Args:
-        data (list): List of row dicts (Student, CO, Marks, Weight, etc.)
+        data (list): List of row dicts (Student, Assessment, Question, CO, Marks, Max_Marks, Weight)
         config_sheets (dict): Full configuration
         
     Returns:
-        dict: {CO: Achieved_%}
+        dict: {CO: {"Achieved_%": float, "Attainment_Level": float}}
     """
     if not data:
         return {}
         
-    # 1. Calculate Raw Scores (Sum of Marks/Max * Weight)
-    scores = calculate_co_scores(data)
+    targets_df = config_sheets["Attainment_Targets"]
+    # Usually targets_df contains 'Min_Marks_%'
+    reference_min_marks = float(targets_df.iloc[0]["Min_Marks_%"])
     
-    # 2. Calculate Total Weight per CO for this subset (Normalization Base)
-    co_total_weights = defaultdict(float)
-    processed_configs = set() # (Assessment, CO)
+    # 1. Group data by (Assessment, CO, Question)
+    question_data = defaultdict(list)
+    for row in data:
+        key = (row["Assessment"], row["CO"], row["Question"])
+        question_data[key].append(row)
+        
+    # 2. Calculate achieved percentage per question
+    question_achieved = {}
+    for key, rows in question_data.items():
+        total_students = len(rows)
+        if total_students == 0:
+            question_achieved[key] = 0.0
+            continue
+            
+        achieved_count = 0
+        for r in rows:
+            if r["Max_Marks"] > 0:
+                pct = (r["Marks"] / r["Max_Marks"]) * 100.0
+                if pct >= reference_min_marks:
+                    achieved_count += 1
+                    
+        question_achieved[key] = (achieved_count / total_students) * 100.0
+
+    # 3. Average achieved percentages for each (Assessment, CO)
+    assessment_co_data = defaultdict(list)
+    assessment_co_weights = {}
     
+    for (assessment, co, question), achieved_pct in question_achieved.items():
+        assessment_co_data[(assessment, co)].append(achieved_pct)
+        
     for row in data:
         key = (row["Assessment"], row["CO"])
-        if key not in processed_configs:
-            co_total_weights[row["CO"]] += row["Weight"]
-            processed_configs.add(key)
-            
-    # 3. Normalize Scores to 0-100% Scale
-    percentages = {}
-    for (student, co), raw_score in scores.items():
-        max_weight = co_total_weights.get(co, 1.0)
-        
-        if max_weight > 0:
-            final_percent = (raw_score / max_weight) * 100
-        else:
-            final_percent = 0.0
-            
-        percentages[(student, co)] = round(final_percent, 2)
+        # Ensure we capture the weight for this Assessment-CO pair
+        if key not in assessment_co_weights:
+            assessment_co_weights[key] = row["Weight"]
 
-    return calculate_achieved_percentage(percentages, config_sheets["Attainment_Targets"])
+    assessment_co_achieved = {}
+    for key, pcts in assessment_co_data.items():
+        assessment_co_achieved[key] = sum(pcts) / len(pcts)
+        
+    # 4. Compute final weighted sum/average per CO
+    co_achieved_pcts = defaultdict(float)
+    co_achieved_levels = defaultdict(float)
+    co_weight_sums = defaultdict(float)
+    
+    for (assessment, co), achieved_pct in assessment_co_achieved.items():
+        weight = assessment_co_weights.get((assessment, co), 0.0)
+        
+        # Convert this specific assessment's percentage to a Level
+        level = determine_attainment_level(achieved_pct, targets_df)
+        
+        co_achieved_pcts[co] += achieved_pct * weight
+        co_achieved_levels[co] += level * weight
+        co_weight_sums[co] += weight
+        
+    final_results = {}
+    for co in co_weight_sums:
+        total_weight = co_weight_sums[co]
+        if total_weight > 0:
+            final_pct = round(co_achieved_pcts[co] / total_weight, 2)
+            final_level = round(co_achieved_levels[co] / total_weight, 2)
+            final_results[co] = {
+                "Achieved_%": final_pct,
+                "Attainment_Level": final_level
+            }
+        else:
+            final_results[co] = {
+                "Achieved_%": 0.0,
+                "Attainment_Level": 0.0
+            }
+            
+    return final_results
 
 # ------------------------------------------------------------------
 #  MAIN CALCULATION FUNCTION
@@ -268,16 +319,16 @@ def calculate_weighted_co_attainment(cleaned_normalized_data, config_sheets):
     # 5. Merge and Calculate Final Attainment Level
     final_results = {}
     all_cos = set(direct_achieved.keys()) | set(indirect_achieved.keys())
-    
-    targets_df = config_sheets["Attainment_Targets"]
 
     for co in all_cos:
-        d_im = direct_achieved.get(co, 0.0)
-        i_im = indirect_achieved.get(co, 0.0)
+        d_data = direct_achieved.get(co, {"Achieved_%": 0.0, "Attainment_Level": 0.0})
+        i_data = indirect_achieved.get(co, {"Achieved_%": 0.0, "Attainment_Level": 0.0})
 
-        # Calculate levels independently first
-        d_level = determine_attainment_level(d_im, targets_df)
-        i_level = determine_attainment_level(i_im, targets_df)
+        d_im = d_data["Achieved_%"]
+        d_level = d_data["Attainment_Level"]
+        
+        i_im = i_data["Achieved_%"]
+        i_level = i_data["Attainment_Level"]
 
         # Weighted Average of the "Achieved Percentage"
         final_achieved_percent = (d_im * direct_weight) + (i_im * indirect_weight)
@@ -288,11 +339,11 @@ def calculate_weighted_co_attainment(cleaned_normalized_data, config_sheets):
         final_results[co] = {
             "Direct": {
                 "Achieved_%": round(d_im, 2),
-                "Attainment_Level": d_level
+                "Attainment_Level": round(d_level, 2)
             },
             "Indirect": {
                 "Achieved_%": round(i_im, 2),
-                "Attainment_Level": i_level
+                "Attainment_Level": round(i_level, 2)
             },
             "Final": {
                 "Achieved_%": round(final_achieved_percent, 2),
